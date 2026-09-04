@@ -1,0 +1,21 @@
+# dsh-external-session bundle patch.
+#
+# This plugin REPLACES the default JSONL session-persistence backend with a
+# routed one: sessions whose cwd falls under a configured external project are
+# stored natively inside that project (<root>/<--cwd-->/<sessionId>/…), while
+# every other workspace keeps using the internal root (default $DSH_HOME/sessions).
+#
+# The default row lives in the `@deepseek-ai/dsh-base` bundle layer; the profile
+# patch layer is applied after every bundle layer, so disabling it here and
+# inserting our provider is the one-and-only replacement point (single-provider
+# Cordis Service semantics). Reversible: remove these lines to restore the stock
+# backend.
+- id: session-persistence-jsonl
+  disabled: true
+
+# The routed backend. Per-project routing config is user-specific and belongs in
+# the PROFILE cordis.patch.yml (or a --patch overlay), not here — see README.zh.md
+# "安装" for the exact external-entry shape.
+- insert:
+    - id: dsh-external-session
+      name: dsh-external-session
